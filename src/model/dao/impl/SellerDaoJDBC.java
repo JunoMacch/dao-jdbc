@@ -121,7 +121,58 @@ public class SellerDaoJDBC implements SellerDao {
 
     @Override
     public List<Seller> findAll() {
-        return null;
+        //Instanciar como statment e resultSet como null
+        PreparedStatement st = null;
+        ResultSet rs = null;
+
+        //fazer o try pq o sql pode gerar exceção
+        try {
+            st = conn.prepareStatement(
+                    "SELECT seller.*, department.Name AS DepName "
+                            + "FROM seller INNER JOIN department "
+                            + "ON seller.DepartmentId = department.Id "
+                            + "ORDER BY Name; "
+            );
+
+            rs = st.executeQuery();
+
+            List<Seller> listSeller = new ArrayList<>();
+            Map<Integer, Department> mapDepartment = new HashMap<>();
+
+            //como o resultado pode ser 0 ou + valores precisamos fazer while e ter uma lista instanciada (listSeller)
+            //para guardar os resultados
+            while(rs.next()) {
+
+                //instanciamos um map(mapDepartment) pq não podemos instanciar mais de um departamento
+                //guardarmos dentro do map cada departamento que seja instanciado e cada vez q o while
+                //for percorrido sera feita uma validação para saber se o departamento já existe
+                //seguindo a regra do if, instanciando o departamento somente quando o departamento não existir
+                Department dep = mapDepartment.get(rs.getInt("DepartmentId"));
+
+                if (dep == null) {
+                    //instanciando departamento inexistente
+                    dep = instantiateDepartment(rs);
+
+                    //e guardamos o departamento criado no map, para checarmos se este departamento
+                    //ira existir da proxima vez que o while for percorrido
+                    mapDepartment.put(rs.getInt("DepartmentId"), dep);
+                }
+
+                //aqui instanciamos o vendedor, e apontamos para o departamento que esta guardado no map
+                //dessa forma quando 2 resultados tiverem o mesmo departamento, eles apontarão para a mesma
+                //instancia desse departamento, sem duplica-lo
+                Seller seller = instantiateSeller(rs, dep);
+                listSeller.add(seller);
+            }
+            return listSeller;
+
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+        finally {
+            DB.closeStatment(st);
+            DB.closeResultSet(rs);
+        }
     }
 
     @Override
@@ -140,23 +191,36 @@ public class SellerDaoJDBC implements SellerDao {
                         + "ORDER BY Name; "
             );
 
+            //aqui passamos que o id tem q entrar no lugar da "?" e executamos a query
             st.setInt(1, department.getId());
-
             rs = st.executeQuery();
 
             List<Seller> listSeller = new ArrayList<>();
             Map<Integer, Department> mapDepartment = new HashMap<>();
 
+            //como o resultado pode ser 0 ou + valores precisamos fazer while e ter uma lista instanciada (listSeller)
+            //para guardar os resultados
             while(rs.next()) {
 
+                //instanciamos um map(mapDepartment) pq não podemos instanciar mais de um departamento
+                //guardarmos dentro do map cada departamento que seja instanciado e cada vez q o while
+                //for percorrido sera feita uma validação para saber se o departamento já existe
+                //seguindo a regra do if, instanciando o departamento somente quando o departamento não existir
                 Department dep = mapDepartment.get(rs.getInt("DepartmentId"));
 
                 if (dep == null) {
+                    //instanciando departamento inexistente
                     dep = instantiateDepartment(rs);
+
+                    //e guardamos o departamento criado no map, para checarmos se este departamento
+                    //ira existir da proxima vez que o while for percorrido
                     mapDepartment.put(rs.getInt("DepartmentId"), dep);
                 }
 
-                Seller seller = instantiateSeller(rs,dep);
+                //aqui instanciamos o vendedor, e apontamos para o departamento que esta guardado no map
+                //dessa forma quando 2 resultados tiverem o mesmo departamento, eles apontarão para a mesma
+                //instancia desse departamento, sem duplica-lo
+                Seller seller = instantiateSeller(rs, dep);
                 listSeller.add(seller);
             }
             return listSeller;

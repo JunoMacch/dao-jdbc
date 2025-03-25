@@ -28,7 +28,16 @@ public class Principal {
             System.out.println(sel);
         }
 
-        System.out.println("=================Teste 1: findByDepartment=================");
+        System.out.println("=================Teste 2: findByDepartment=================\n");
+
+        System.out.println("=================Teste 3: findAll=================");
+
+        List<Seller> listVendedor = sellerDao.findAll();
+        for (Seller vendedor : listVendedor) {
+            System.out.println(vendedor);
+        }
+
+        System.out.println("=================Teste 3: findAll=================");
 
     }
 
