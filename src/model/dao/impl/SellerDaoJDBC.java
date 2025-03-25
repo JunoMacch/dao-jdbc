@@ -67,24 +67,12 @@ public class SellerDaoJDBC implements SellerDao {
             //o resultSet aponta para a posição 0, então é necessário fazer um if com rs.next
             //para testar se obtivemos algum resultado, do contrario pulamos para fora if com null
             if(rs.next()) {
-                //agora instanciamos um departamento para atribuir os valores da consulta sql
-                //a uma instancia de Department, pegando com set+atributo da classe Department
-                //para setarmos o valor que veio na consulta sql pegando eles com o get dentro de rs.get
-                Department dep = new Department();
-                dep.setId(rs.getInt("DepartmentId"));
-                dep.setName(rs.getString("DepName"));
 
-                //aqui funciona da mesma forma que o Department settamos nos atributos passados na classe seller
-                //os valores recuperados  na query sql com o get dentro dos metodos set
-                //e para passarmos os atributos associados nós temos que ter esse atributo ja construido
-                //por exemplo o department dep que instanciamos primeiro, para conseguirmos instanciar o Seller
-                Seller seller = new Seller();
-                seller.setId(rs.getInt("Id"));
-                seller.setName(rs.getString("Name"));
-                seller.setEmail(rs.getString("Email"));
-                seller.setBaseSalary(rs.getDouble("BaseSalary"));
-                seller.setBirthDate(rs.getDate("BirthDate"));
-                seller.setDepartment(dep);
+                //Ler o metodo instantiateDepartment caso tenha alguma duvida pq o codigo foi refatorado para metodo
+                Department dep = instantiateDepartment(rs);
+
+                //Ler o metodo instantiateSeller caso tenha alguma duvida, pq o codigo foi refatorado para metodo
+                Seller seller = instantiateSeller(rs,dep);
 
                 return seller;
             }
@@ -101,6 +89,31 @@ public class SellerDaoJDBC implements SellerDao {
             DB.closeResultSet(rs);
         }
 
+    }
+
+    private Seller instantiateSeller(ResultSet rs, Department dep) throws SQLException {
+        //aqui funciona da mesma forma que o Department settamos nos atributos passados na classe seller
+        //os valores recuperados  na query sql com o get dentro dos metodos set
+        //e para passarmos os atributos associados nós temos que ter esse atributo ja construido
+        //por exemplo o department dep que instanciamos primeiro, para conseguirmos instanciar o Seller
+        Seller seller = new Seller();
+        seller.setId(rs.getInt("Id"));
+        seller.setName(rs.getString("Name"));
+        seller.setEmail(rs.getString("Email"));
+        seller.setBaseSalary(rs.getDouble("BaseSalary"));
+        seller.setBirthDate(rs.getDate("BirthDate"));
+        seller.setDepartment(dep);
+        return seller;
+    }
+
+    private Department instantiateDepartment(ResultSet rs) throws SQLException {
+        //agora instanciamos um departamento para atribuir os valores da consulta sql
+        //a uma instancia de Department, pegando com set+atributo da classe Department
+        //para setarmos o valor que veio na consulta sql pegando eles com o get dentro de rs.get
+        Department dep = new Department();
+        dep.setId(rs.getInt("DepartmentId"));
+        dep.setName(rs.getString("DepName"));
+        return dep;
     }
 
     @Override

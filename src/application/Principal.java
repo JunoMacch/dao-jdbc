@@ -13,9 +13,11 @@ public class Principal {
 
         SellerDao sellerDao = DaoFactory.createSellerDao();
 
+        System.out.println("=================Teste 1: findById=================");
         Seller seller = sellerDao.findById(1);
 
         System.out.println(seller);
+        System.out.println("=================Teste 1: findById=================");
 
     }
 
