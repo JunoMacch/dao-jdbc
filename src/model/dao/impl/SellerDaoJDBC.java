@@ -28,6 +28,61 @@ public class SellerDaoJDBC implements SellerDao {
     @Override
     public void insert(Seller seller) {
 
+        //instanciar o preparedStatement como null
+        PreparedStatement st = null;
+
+        try {
+            //agora montamos o statement
+            st = conn.prepareStatement(
+                    "INSERT INTO seller "
+                    + "(Name, Email, BirthDate, BaseSalary, DepartmentId) "
+                    + "VALUES "
+                    + "(?, ?, ?, ?, ?)",
+                    //colocamos esse comando para retornar o id do novo vendedor inserido
+                    PreparedStatement.RETURN_GENERATED_KEYS
+            );
+
+            //agora passamos cada um dos valores para atribuir aos parametros de VALUES
+            st.setString(1, seller.getName());
+            st.setString(2, seller.getEmail());
+
+            //dessa forma que fazemos para colocar a data de nascimento
+            st.setDate(3, new java.sql.Date(seller.getBirthDate().getTime()));
+
+            st.setDouble(4, seller.getBaseSalary());
+
+            //aqui para passar qual o departamento do vendedor temos q navegar pelo objeto department até chegar ao id
+            st.setInt(5, seller.getDepartment().getId());
+
+            int rowsAffected = st.executeUpdate();
+
+            //aqui testamos se a variavel é maior que 0 para identificarmos se inseriu ou não valor na tabela
+            if (rowsAffected > 0) {
+
+                //
+                ResultSet rs = st.getGeneratedKeys();
+
+                //faremos um if pois estamos inserindo apenas um dado, testamos se caso existir um valor,
+                //nós pegamos o valor do id gerado, e atribuimos o id dentro do objeto seller
+                if (rs.next()) {
+                    //passamos a posição 1, pois id é a primeira coluna das CHAVES (st.getGeneratedKeys()
+                    int id = rs.getInt(1);
+
+                    //atribuimos o id gerado dentro de seller, para que o objeto fique populado com o novo id dele
+                    seller.setId(id);
+                }
+                DB.closeResultSet(rs);
+            }
+            else {
+                //fazemos esse bloco para tratar se a linha que querjos inserir tenha algum conflito e n seja inserida
+                throw new DbException("Erro Inesperado nenhuma linha foi afetada");
+            }
+
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatment(st);
+        }
     }
 
     @Override

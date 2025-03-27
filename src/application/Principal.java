@@ -37,7 +37,15 @@ public class Principal {
             System.out.println(vendedor);
         }
 
-        System.out.println("=================Teste 3: findAll=================");
+        System.out.println("=================Teste 3: findAll=================\n");
+
+        System.out.println("=================Teste 4: insert=================");
+
+        Seller newSeller = new Seller(null, "Junior", "ju@email.com", new Date(), 3000.00, department);
+        sellerDao.insert(newSeller);
+        System.out.println("Inserted! New id = " + newSeller.getId());
+
+        System.out.println("=================Teste 4: insert=================");
 
     }
 
