@@ -127,7 +127,26 @@ public class SellerDaoJDBC implements SellerDao {
 
     @Override
     public void deleteById(Integer id) {
+        //Instanciar como statment e resultSet como null
+        PreparedStatement st = null;
 
+        //fazer o try pq o sql pode gerar exceção
+        try {
+            //atribuir ao st o a conexão com o prepareStatment para relizar
+            //a busca no banco de dados
+            st = conn.prepareStatement(
+                    "DELETE FROM seller WHERE Id = ?"
+            );
+
+            st.setInt(1, id);
+
+            st.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatment(st);
+        }
     }
 
     @Override
