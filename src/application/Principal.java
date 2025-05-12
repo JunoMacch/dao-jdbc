@@ -22,7 +22,7 @@ public class Principal {
 
         System.out.println("=================Teste 2: findByDepartment=================");
 
-        Department department = new Department(2, null);
+        Department department = new Department(3, null);
         List<Seller> listSeller = sellerDao.findByDepartment(department);
         for (Seller sel : listSeller) {
             System.out.println(sel);
@@ -41,11 +41,21 @@ public class Principal {
 
         System.out.println("=================Teste 4: insert=================");
 
-        Seller newSeller = new Seller(null, "Junior", "ju@email.com", new Date(), 3000.00, department);
+        Seller newSeller = new Seller(null, "Sergio", "advogato@email.oab", new Date(), 10000.00, department);
         sellerDao.insert(newSeller);
         System.out.println("Inserted! New id = " + newSeller.getId());
 
         System.out.println("=================Teste 4: insert=================");
+
+
+        System.out.println("=================Teste 5: update=================");
+
+        seller = sellerDao.findById(1);
+        seller.setName("Jonas Jorginton");
+        sellerDao.update(seller);
+        System.out.println("Update completed");
+
+        System.out.println("=================Teste 5: update=================");
 
     }
 

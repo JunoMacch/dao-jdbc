@@ -87,7 +87,42 @@ public class SellerDaoJDBC implements SellerDao {
 
     @Override
     public void update(Seller seller) {
+        //Instanciar como statment e resultSet como null
+        PreparedStatement st = null;
 
+        //fazer o try pq o sql pode gerar exceção
+        try {
+            //atribuir ao st o a conexão com o prepareStatment para relizar
+            //a busca no banco de dados
+            st = conn.prepareStatement(
+                    "UPDATE seller " +
+                            "SET Name = ?, Email = ?, BirthDate = ?, BaseSalary = ?, DepartmentId = ? " +
+                            "WHERE Id = ?"
+            );
+
+            //agora passamos cada um dos valores para atribuir aos parametros de VALUES
+            st.setString(1, seller.getName());
+            st.setString(2, seller.getEmail());
+
+            //dessa forma que fazemos para colocar a data de nascimento
+            st.setDate(3, new java.sql.Date(seller.getBirthDate().getTime()));
+
+            st.setDouble(4, seller.getBaseSalary());
+
+            //aqui para passar qual o departamento do vendedor temos q navegar pelo objeto department até chegar ao id
+            st.setInt(5, seller.getDepartment().getId());
+
+            st.setInt(6, seller.getId());
+
+            int rowsAffected = st.executeUpdate();
+
+            st.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatment(st);
+        }
     }
 
     @Override
