@@ -75,7 +75,7 @@ public class SellerDaoJDBC implements SellerDao {
             }
             else {
                 //fazemos esse bloco para tratar se a linha que querjos inserir tenha algum conflito e n seja inserida
-                throw new DbException("Erro Inesperado nenhuma linha foi afetada");
+                throw new DbException("Erro inesperado nenhuma linha foi afetada");
             }
 
         } catch (SQLException e) {
@@ -113,8 +113,6 @@ public class SellerDaoJDBC implements SellerDao {
             st.setInt(5, seller.getDepartment().getId());
 
             st.setInt(6, seller.getId());
-
-            int rowsAffected = st.executeUpdate();
 
             st.executeUpdate();
 
